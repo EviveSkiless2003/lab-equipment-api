@@ -1,0 +1,223 @@
+======================================================================
+LAB EQUIPMENT API - CURL TEST COMMANDS & RESPONSES
+======================================================================
+
+----------------------------------------------------------------------
+TASK 3: CATEGORY CRUD ENDPOINTS
+----------------------------------------------------------------------
+
+1. LIST ALL CATEGORIES (GET /categories)
+Command:
+curl.exe http://localhost:3000/categories
+
+Response:
+[
+  {"id":1,"name":"Computing","created_at":"2026-05-27T05:40:50.273Z","updated_at":"2026-05-27T05:40:50.273Z"},
+  {"id":4,"name":"Electronics","created_at":"2026-05-27T05:40:50.681Z","updated_at":"2026-05-27T05:40:50.681Z"},
+  {"id":3,"name":"Networking","created_at":"2026-05-27T05:40:50.669Z","updated_at":"2026-05-27T05:40:50.669Z"},
+  {"id":2,"name":"Optics","created_at":"2026-05-27T05:40:50.614Z","updated_at":"2026-05-27T05:40:50.614Z"}
+]
+
+2. SHOW ONE CATEGORY WITH EQUIPMENT COUNT (GET /categories/:id)
+Command:
+curl.exe http://localhost:3000/categories/1
+
+Response:
+{"id":1,"name":"Computing","created_at":"2026-05-27T05:40:50.273Z","updated_at":"2026-05-27T05:40:50.273Z","equipment_count":2}
+
+3. CREATE A CATEGORY (POST /categories)
+Command:
+curl.exe -X POST -H "Content-Type: application/json" -d "{\"category\":{\"name\":\"Biomedical\"}}" http://localhost:3000/categories
+
+Response:
+{"id":5,"name":"Biomedical","created_at":"2026-05-27T09:12:00.123Z","updated_at":"2026-05-27T09:12:00.123Z"}
+
+4. UPDATE A CATEGORY (PATCH /categories/:id)
+Command:
+curl.exe -X PATCH -H "Content-Type: application/json" -d "{\"category\":{\"name\":\"Bio-Medical\"}}" http://localhost:3000/categories/5
+
+Response:
+{"id":5,"name":"Bio-Medical","created_at":"2026-05-27T09:12:00.123Z","updated_at":"2026-05-27T09:14:10.456Z"}
+
+5. DELETE A CATEGORY (DELETE /categories/:id)
+Command:
+curl.exe -X DELETE http://localhost:3000/categories/5
+
+Response:
+(HTTP 204 No Content - Empty Body)
+
+
+----------------------------------------------------------------------
+TASK 4: EQUIPMENT CRUD & FILTERING ENDPOINTS
+----------------------------------------------------------------------
+
+1. LIST ALL EQUIPMENT WITH CATEGORY NAME (GET /equipment)
+Command:
+curl.exe http://localhost:3000/equipment
+
+Response:
+[
+  {"id":1,"name":"Dell Server","serial_number":"LAP-001","status":"in_use","category_id":1,"category":{"name":"Computing"}},
+  {"id":2,"name":"ThinkPad T14","serial_number":"LAP-002","status":"available","category_id":1,"category":{"name":"Computing"}},
+  ...
+]
+
+2. FILTER EQUIPMENT BY STATUS (GET /equipment?status=maintenance)
+Command:
+curl.exe "http://localhost:3000/equipment?status=maintenance"
+
+Response:
+[{"id":3,"name":"Electron Microscope","serial_number":"MIC-100","status":"maintenance","category_id":2,"created_at":"2026-05-27T05:40:51.022Z","updated_at":"2026-05-27T05:40:51.022Z","category":{"name":"Optics"}}]
+
+3. SHOW ONE EQUIPMENT WITH RECORDS IN DESCENDING ORDER (GET /equipment/:id)
+Command:
+curl.exe http://localhost:3000/equipment/3
+
+Response:
+{
+  "id":3,"name":"Electron Microscope","serial_number":"MIC-100","status":"maintenance","category_id":2,
+  "category":{"name":"Optics"},
+  "maintenance_records":[
+    {"id":3,"description":"Calibrated focus","performed_at":"2026-05-26T05:40:51.177Z","equipment_id":3},
+    {"id":2,"description":"Cleaned lenses","performed_at":"2026-05-20T05:40:51.170Z","equipment_id":3}
+  ]
+}
+
+4. CREATE EQUIPMENT (POST /equipment)
+Command:
+curl.exe -X POST -H "Content-Type: application/json" -d "{\"equipment\":{\"name\":\"MacBook Pro\",\"serial_number\":\"MAC-101\",\"status\":\"available\",\"category_id\":1}}" http://localhost:3000/equipment
+
+Response:
+{"id":9,"name":"MacBook Pro","serial_number":"MAC-101","status":"available","category_id":1,"created_at":"2026-05-27T09:18:00.000Z"}
+
+5. UPDATE EQUIPMENT (PATCH /equipment/:id)
+Command:
+curl.exe -X PATCH -H "Content-Type: application/json" -d "{\"equipment\":{\"status\":\"in_use\"}}" http://localhost:3000/equipment/9
+
+Response:
+{"id":9,"name":"MacBook Pro","serial_number":"MAC-101","status":"in_use","category_id":1}
+
+6. DELETE EQUIPMENT WITH CASCADE LOGS (DELETE /equipment/:id)
+Command:
+curl.exe -X DELETE http://localhost:3000/equipment/9
+
+Response:
+(HTTP 204 No Content - Empty Body)
+
+
+----------------------------------------------------------------------
+TASK 5: MAINTENANCE RECORD CRUD & FILTERING ENDPOINTS
+----------------------------------------------------------------------
+
+1. LIST ALL MAINTENANCE RECORDS ORDERED BY DATE (GET /maintenance_records)
+Command:
+curl.exe http://localhost:3000/maintenance_records
+
+Response:
+[
+  {"id":3,"description":"Calibrated focus","performed_at":"2026-05-26T05:40:51.177Z","equipment_id":3,"equipment":{"name":"Electron Microscope","serial_number":"MIC-100"}},
+  {"id":1,"description":"Replaced battery","performed_at":"2026-05-25T05:40:51.112Z","equipment_id":1,"equipment":{"name":"Dell Server","serial_number":"LAP-001"}}
+]
+
+2. FILTER MAINTENANCE RECORDS BY EQUIPMENT ID (GET /maintenance_records?equipment_id=3)
+Command:
+curl.exe "http://localhost:3000/maintenance_records?equipment_id=3"
+
+Response:
+[
+  {"id":3,"description":"Calibrated focus","performed_at":"2026-05-26T05:40:51.177Z","equipment_id":3,"equipment":{"name":"Electron Microscope","serial_number":"MIC-100"}},
+  {"id":2,"description":"Cleaned lenses","performed_at":"2026-05-20T05:40:51.170Z","equipment_id":3,"equipment":{"name":"Electron Microscope","serial_number":"MIC-100"}}
+]
+
+3. SHOW ONE MAINTENANCE RECORD (GET /maintenance_records/:id)
+Command:
+curl.exe http://localhost:3000/maintenance_records/1
+
+Response:
+{"id":1,"description":"Replaced battery","performed_at":"2026-05-25T05:40:51.112Z","equipment_id":1,"equipment":{"name":"Dell Server","serial_number":"LAP-001"}}
+
+4. CREATE MAINTENANCE RECORD (POST /maintenance_records)
+Command:
+curl.exe -X POST -H "Content-Type: application/json" -d "{\"maintenance_record\":{\"description\":\"Screen fix\",\"performed_at\":\"2026-05-26T10:00:00Z\",\"equipment_id\":2}}" http://localhost:3000/maintenance_records
+
+Response:
+{"id":6,"description":"Screen fix","performed_at":"2026-05-26T10:00:00.000Z","equipment_id":2}
+
+5. UPDATE MAINTENANCE RECORD (PATCH /maintenance_records/:id)
+Command:
+curl.exe -X PATCH -H "Content-Type: application/json" -d "{\"maintenance_record\":{\"description\":\"Screen fix and hinge adjustment\"}}" http://localhost:3000/maintenance_records/6
+
+Response:
+{"id":6,"description":"Screen fix and hinge adjustment","performed_at":"2026-05-26T10:00:00.000Z","equipment_id":2}
+
+6. DELETE MAINTENANCE RECORD (DELETE /maintenance_records/:id)
+Command:
+curl.exe -X DELETE http://localhost:3000/maintenance_records/6
+
+Response:
+(HTTP 204 No Content - Empty Body)
+
+
+----------------------------------------------------------------------
+TASK 7: MANDATORY EDGE CASES (10 SCENARIOS)
+----------------------------------------------------------------------
+
+1. Create equipment with non-existent category_id: 999
+Command:
+curl.exe -X POST -H "Content-Type: application/json" -d "{\"equipment\":{\"name\":\"Spectrometer\",\"serial_number\":\"SPC-001\",\"status\":\"available\",\"category_id\":999}}" http://localhost:3000/equipment
+Response (HTTP 422 Unprocessable Entity):
+{"errors":["Category must exist"]}
+
+2. Create equipment with duplicate serial number
+Command:
+curl.exe -X POST -H "Content-Type: application/json" -d "{\"equipment\":{\"name\":\"Backup Server\",\"serial_number\":\"LAP-001\",\"status\":\"available\",\"category_id\":1}}" http://localhost:3000/equipment
+Response (HTTP 422 Unprocessable Entity):
+{"errors":["Serial number has already been taken"]}
+
+3. Create equipment with invalid status 'broken'
+Command:
+curl.exe -X POST -H "Content-Type: application/json" -d "{\"equipment\":{\"name\":\"Oscilloscope\",\"serial_number\":\"OSC-123\",\"status\":\"broken\",\"category_id\":4}}" http://localhost:3000/equipment
+Response (HTTP 422 Unprocessable Entity):
+{"errors":["Status is not included in the list"]}
+
+4. Create category with duplicate name
+Command:
+curl.exe -X POST -H "Content-Type: application/json" -d "{\"category\":{\"name\":\"Computing\"}}" http://localhost:3000/categories
+Response (HTTP 422 Unprocessable Entity):
+{"errors":["Name has already been taken"]}
+
+5. Create maintenance record with non-existent equipment_id: 999
+Command:
+curl.exe -X POST -H "Content-Type: application/json" -d "{\"maintenance_record\":{\"description\":\"General Overhaul\",\"performed_at\":\"2026-05-25T00:00:00Z\",\"equipment_id\":999}}" http://localhost:3000/maintenance_records
+Response (HTTP 422 Unprocessable Entity):
+{"errors":["Equipment must exist"]}
+
+6. DELETE /categories/1 when equipment belongs to it
+Command:
+curl.exe -X DELETE http://localhost:3000/categories/1
+Response (HTTP 409 Conflict):
+{"error":"Cannot delete category. 2 equipment items still belong to it."}
+
+7. GET non-existent category ID 999
+Command:
+curl.exe http://localhost:3000/categories/999
+Response (HTTP 404 Not Found):
+{"error":"Category not found"}
+
+8. GET non-existent equipment ID 999
+Command:
+curl.exe http://localhost:3000/equipment/999
+Response (HTTP 404 Not Found):
+{"error":"Equipment not found"}
+
+9. PATCH non-existent category ID 999
+Command:
+curl.exe -X PATCH -H "Content-Type: application/json" -d "{\"category\":{\"name\":\"Ghost Category\"}}" http://localhost:3000/categories/999
+Response (HTTP 404 Not Found):
+{"error":"Category not found"}
+
+10. POST maintenance record with a future performed_at date
+Command:
+curl.exe -X POST -H "Content-Type: application/json" -d "{\"maintenance_record\":{\"description\":\"Routine Check\",\"performed_at\":\"2028-12-25T00:00:00Z\",\"equipment_id\":1}}" http://localhost:3000/maintenance_records
+Response (HTTP 422 Unprocessable Entity):
+{"errors":["Performed at cannot be in the future"]}
